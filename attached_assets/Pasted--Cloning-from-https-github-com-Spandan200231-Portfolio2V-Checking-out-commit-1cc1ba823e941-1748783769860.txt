@@ -1,0 +1,100 @@
+==> Cloning from https://github.com/Spandan200231/Portfolio2V
+==> Checking out commit 1cc1ba823e9417e4a6bc7cbe5a12d25aa20f6ed7 in branch main
+==> Downloading cache...
+==> Transferred 212MB in 8s. Extraction took 4s.
+==> Installing dependencies with npm...
+==> Using Node.js version 22.14.0 (default)
+==> Docs on specifying a Node.js version: https://render.com/docs/node-version
+==> Using Bun version 1.1.0 (default)
+==> Docs on specifying a bun version: https://render.com/docs/bun-version
+up to date, audited 531 packages in 1s
+70 packages are looking for funding
+  run `npm fund` for details
+4 moderate severity vulnerabilities
+To address all issues, run:
+  npm audit fix
+Run `npm audit` for details.
+up to date, audited 531 packages in 958ms
+70 packages are looking for funding
+  run `npm fund` for details
+4 moderate severity vulnerabilities
+To address all issues, run:
+  npm audit fix
+Run `npm audit` for details.
+==> Running build command 'npm install; npm run build'...
+up to date, audited 531 packages in 960ms
+70 packages are looking for funding
+  run `npm fund` for details
+4 moderate severity vulnerabilities
+To address all issues, run:
+  npm audit fix
+Run `npm audit` for details.
+> rest-express@1.0.0 build
+> vite build && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist
+vite v5.4.14 building for production...
+transforming...
+Browserslist: browsers data (caniuse-lite) is 8 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+✓ 1738 modules transformed.
+rendering chunks...
+computing gzip size...
+../dist/public/index.html                     1.46 kB │ gzip:   0.68 kB
+../dist/public/assets/index-C000nua3.css     81.87 kB │ gzip:  13.86 kB
+../dist/public/assets/index-DEuqUv0d.js   1,393.74 kB │ gzip: 426.19 kB
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 5.92s
+✘ [ERROR] Multiple exports with the same name "getUserByEmail"
+    server/storage.ts:139:2:
+      139 │   getUserByEmail,
+          ╵   ~~~~~~~~~~~~~~
+  The name "getUserByEmail" was originally exported here:
+    server/storage.ts:17:22:
+      17 │ export async function getUserByEmail(email: string): Promise<IUser...
+         ╵                       ~~~~~~~~~~~~~~
+✘ [ERROR] Multiple exports with the same name "getUserById"
+    server/storage.ts:140:2:
+      140 │   getUserById,
+          ╵   ~~~~~~~~~~~
+  The name "getUserById" was originally exported here:
+    server/storage.ts:21:22:
+      21 │ export async function getUserById(id: string): Promise<IUser | nul...
+         ╵                       ~~~~~~~~~~~
+✘ [ERROR] Multiple exports with the same name "upsertUser"
+    server/storage.ts:141:2:
+      141 │   upsertUser,
+          ╵   ~~~~~~~~~~
+  The name "upsertUser" was originally exported here:
+    server/storage.ts:25:22:
+      25 │ export async function upsertUser(user: InsertUser): Promise<IUser> {
+         ╵                       ~~~~~~~~~~
+✘ [ERROR] Multiple exports with the same name "getPortfolioItems"
+    server/storage.ts:142:2:
+      142 │   getPortfolioItems,
+          ╵   ~~~~~~~~~~~~~~~~~
+  The name "getPortfolioItems" was originally exported here:
+    server/storage.ts:35:22:
+      35 │ export async function getPortfolioItems(): Promise<IPortfolioItem[...
+         ╵                       ~~~~~~~~~~~~~~~~~
+✘ [ERROR] Multiple exports with the same name "getPortfolioItemById"
+    server/storage.ts:143:2:
+      143 │   getPortfolioItemById,
+          ╵   ~~~~~~~~~~~~~~~~~~~~
+  The name "getPortfolioItemById" was originally exported here:
+    server/storage.ts:39:22:
+      39 │ export async function getPortfolioItemById(id: string): Promise<IP...
+         ╵                       ~~~~~~~~~~~~~~~~~~~~
+✘ [ERROR] Multiple exports with the same name "getFeaturedPortfolioItems"
+    server/storage.ts:144:2:
+      144 │   getFeaturedPortfolioItems,
+          ╵   ~~~~~~~~~~~~~~~~~~~~~~~~~
+  The name "getFeaturedPortfolioItems" was originally exported here:
+    server/storage.ts:43:22:
+      43 │ export async function getFeaturedPortfolioItems(): Promise<IPortfo...
+         ╵                       ~~~~~~~~~~~~~~~~~~~~~~~~~
+6 of 19 errors shown (disable the message limit with --log-limit=0)
+==> Build failed 😞
+==> Common ways to troubleshoot your deploy: https://render.com/docs/troubleshooting-deploys
