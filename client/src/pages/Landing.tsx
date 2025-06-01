@@ -67,7 +67,7 @@ export default function Landing() {
             Access the admin panel to manage your portfolio content.
           </p>
           <Button asChild>
-            <a href="/api/login" className="bg-primary hover:bg-primary/90 text-white">
+            <a href="/login" className="bg-primary hover:bg-primary/90 text-white">
               Admin Login
             </a>
           </Button>

@@ -7,28 +7,25 @@ Set these environment variables in your Render service dashboard:
 ### Database
 - `DATABASE_URL` - Your PostgreSQL database connection string from Render
 
-### Authentication  
-- `GOOGLE_CLIENT_ID` - Your Google OAuth client ID
-- `GOOGLE_CLIENT_SECRET` - Your Google OAuth client secret
+### Authentication (Optional)
+- `ADMIN_EMAIL` - Admin email address (default: admin@portfolio.com)
+- `ADMIN_PASSWORD` - Admin password (default: admin123)
 - `SESSION_SECRET` - A random secure string (generate one)
 
 ### Application
 - `NODE_ENV=production`
 
-## Google OAuth Setup
+## Admin Access
 
-1. Go to [Google Cloud Console](https://console.cloud.google.com/)
-2. Create a new project or select existing one
-3. Enable Google+ API
-4. Create OAuth 2.0 credentials
-5. Add your Render domain to authorized origins:
-   - `https://your-app-name.onrender.com`
-6. Add callback URL:
-   - `https://your-app-name.onrender.com/api/auth/google/callback`
+The application uses email/password authentication with a default admin account:
+- **Email**: admin@portfolio.com
+- **Password**: admin123
+
+You can customize these credentials by setting the `ADMIN_EMAIL` and `ADMIN_PASSWORD` environment variables.
 
 ## Database Setup
 
-After deployment, your database tables will be created automatically when the app starts.
+After deployment, your database tables will be created automatically when the app starts. The default admin user will also be created automatically.
 
 ## Build Configuration
 
@@ -38,3 +35,9 @@ Render will automatically:
 3. Start the app with `npm start`
 
 The app will be available on the port assigned by Render.
+
+## Security Notes
+
+- Change the default admin credentials in production
+- Use a strong, random `SESSION_SECRET` 
+- The password is securely hashed using bcrypt

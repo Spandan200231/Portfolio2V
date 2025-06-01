@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { useAuth } from "@/hooks/useAuth";
 import NotFound from "@/pages/not-found";
 import Landing from "@/pages/Landing";
+import Login from "@/pages/Login";
 import Home from "@/pages/Home";
 import PortfolioDetail from "@/pages/PortfolioDetail";
 import CaseStudyDetail from "@/pages/CaseStudyDetail";
@@ -30,6 +31,7 @@ function Router() {
     <Switch>
       {/* Public routes */}
       <Route path="/" component={isAuthenticated ? Home : Landing} />
+      <Route path="/login" component={Login} />
       <Route path="/portfolio/:id" component={PortfolioDetail} />
       <Route path="/case-studies/:id" component={CaseStudyDetail} />
       
