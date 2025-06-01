@@ -1,0 +1,78 @@
+Create a modern, professional 3D portfolio website for **Spandan Majumder**, built using:
+
+- **Frontend**: Next.js + Tailwind CSS + Three.js (for subtle 3D design)
+- **Backend**: API Routes in Next.js
+- **Database**: MongoDB (via Mongoose), connected via environment variables
+- **Deployment**: Fully compatible and optimized for **Vercel hosting**
+
+### 🌐 PUBLIC WEBSITE FEATURES
+
+1. **Navigation Bar** with links to:
+   - Home
+   - Portfolio
+   - Case Studies
+   - About Me
+   - Contact Me (includes file attachment field)
+
+2. **Homepage** with brief intro and smooth animations.
+
+3. **Portfolio & Case Studies** sections:
+   - Each post includes a **thumbnail**, **title**, and **short description**
+   - Each has a **"View Full" button** that routes to a dedicated detail page (`/portfolio/[id]` and `/case-studies/[id]`)
+   - These posts are fully **dynamic**, pulled from MongoDB
+
+4. **Contact Me Form**:
+   - Fields: Name, Email, Message, and File Upload
+   - Stores messages (and file metadata) in MongoDB
+   - Sends submissions to Admin panel
+
+---
+
+### 🔒 ADMIN PANEL (`/admin` route)
+
+1. **Login Screen**:
+   - Requires admin email + password (stored securely in MongoDB)
+   - Redirects to dashboard after authentication
+
+2. **Admin Dashboard** (after login):
+   - Sidebar navigation:
+     - Dashboard Overview
+     - Manage Portfolio Posts (Add/Edit/Delete)
+     - Manage Case Studies (Add/Edit/Delete)
+     - View Messages (submitted from Contact Form)
+     - Admin Settings (change email/password)
+   - Logout button in top navbar
+
+3. **CRUD Functionalities**:
+   - Admin can create/update/delete:
+     - Portfolio Posts
+     - Case Studies
+   - File/image uploads supported for both posts
+
+4. **Message Viewer**:
+   - Lists all form submissions from the public site
+   - Allows downloading attached files
+
+5. **Admin Settings**:
+   - Change admin email or password from the dashboard securely
+   - Secure logout
+
+---
+
+### ⚙️ TECH REQUIREMENTS
+
+- **MongoDB** via Mongoose, connected through `MONGODB_URI` in `.env`
+- **Authentication** handled with JWT or NextAuth (JWT preferred for API routes)
+- File uploads handled with `multer`, `cloudinary`, or file system (based on Vercel constraints)
+- Dynamic content fetching on frontend via API endpoints (`/api/portfolio`, `/api/case-studies`, etc.)
+- Codebase structured cleanly for Vercel deployment (no unsupported file handling unless Cloudinary is used)
+
+---
+
+### 📦 EXTRAS
+
+- Responsive design for all devices
+- SEO optimized (meta tags, OG tags)
+- Smooth page transitions, subtle hover/scroll animations
+- Optional: dark mode toggle
+
