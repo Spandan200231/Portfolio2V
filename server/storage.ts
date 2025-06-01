@@ -110,3 +110,49 @@ export async function deleteContactMessage(id: string): Promise<boolean> {
   const result = await ContactMessage.deleteOne({ id });
   return result.deletedCount > 0;
 }
+
+// Create storage object
+export const storage = {
+  getUserByEmail,
+  getUserById,
+  upsertUser,
+  getPortfolioItems,
+  getPortfolioItemById,
+  getFeaturedPortfolioItems,
+  createPortfolioItem,
+  updatePortfolioItem,
+  deletePortfolioItem,
+  getCaseStudies,
+  getCaseStudyById,
+  getFeaturedCaseStudies,
+  createCaseStudy,
+  updateCaseStudy,
+  deleteCaseStudy,
+  getContactMessages,
+  createContactMessage,
+  markMessageAsRead,
+  deleteContactMessage,
+};
+
+// Export all functions for use in routes
+export {
+  getUserByEmail,
+  getUserById,
+  upsertUser,
+  getPortfolioItems,
+  getPortfolioItemById,
+  getFeaturedPortfolioItems,
+  createPortfolioItem,
+  updatePortfolioItem,
+  deletePortfolioItem,
+  getCaseStudies,
+  getCaseStudyById,
+  getFeaturedCaseStudies,
+  createCaseStudy,
+  updateCaseStudy,
+  deleteCaseStudy,
+  getContactMessages,
+  createContactMessage,
+  markMessageAsRead,
+  deleteContactMessage,
+};
