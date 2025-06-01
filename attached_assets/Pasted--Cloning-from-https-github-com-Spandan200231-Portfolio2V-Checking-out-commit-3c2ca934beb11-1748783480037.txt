@@ -1,0 +1,60 @@
+==> Cloning from https://github.com/Spandan200231/Portfolio2V
+==> Checking out commit 3c2ca934beb113d5e3331611cf541e9b5576a16b in branch main
+==> Downloading cache...
+==> Transferred 216MB in 7s. Extraction took 6s.
+==> Installing dependencies with npm...
+==> Using Node.js version 22.14.0 (default)
+==> Docs on specifying a Node.js version: https://render.com/docs/node-version
+==> Using Bun version 1.1.0 (default)
+==> Docs on specifying a bun version: https://render.com/docs/bun-version
+added 23 packages, removed 12 packages, and audited 531 packages in 2s
+70 packages are looking for funding
+  run `npm fund` for details
+4 moderate severity vulnerabilities
+To address all issues, run:
+  npm audit fix
+Run `npm audit` for details.
+up to date, audited 531 packages in 1s
+70 packages are looking for funding
+  run `npm fund` for details
+4 moderate severity vulnerabilities
+To address all issues, run:
+  npm audit fix
+Run `npm audit` for details.
+==> Running build command 'npm install; npm run build'...
+up to date, audited 531 packages in 1s
+70 packages are looking for funding
+  run `npm fund` for details
+4 moderate severity vulnerabilities
+To address all issues, run:
+  npm audit fix
+Run `npm audit` for details.
+> rest-express@1.0.0 build
+> vite build && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist
+vite v5.4.14 building for production...
+transforming...
+Browserslist: browsers data (caniuse-lite) is 8 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+✓ 1738 modules transformed.
+rendering chunks...
+computing gzip size...
+../dist/public/index.html                     1.46 kB │ gzip:   0.68 kB
+../dist/public/assets/index-C000nua3.css     81.87 kB │ gzip:  13.86 kB
+../dist/public/assets/index-DEuqUv0d.js   1,393.74 kB │ gzip: 426.19 kB
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 6.19s
+✘ [ERROR] No matching export in "server/storage.ts" for import "storage"
+    server/routes.ts:4:9:
+      4 │ import { storage } from "./storage";
+        ╵          ~~~~~~~
+✘ [ERROR] No matching export in "server/replitAuth.ts" for import "isAuthenticated"
+    server/routes.ts:5:20:
+      5 │ import { setupAuth, isAuthenticated } from "./replitAuth";
+        ╵                     ~~~~~~~~~~~~~~~
+2 errors
+==> Build failed 😞
+==> Common ways to troubleshoot your deploy: https://render.com/docs/troubleshooting-deploys
