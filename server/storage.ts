@@ -133,26 +133,3 @@ export const storage = {
   markMessageAsRead,
   deleteContactMessage,
 };
-
-// Export all functions for use in routes
-export {
-  getUserByEmail,
-  getUserById,
-  upsertUser,
-  getPortfolioItems,
-  getPortfolioItemById,
-  getFeaturedPortfolioItems,
-  createPortfolioItem,
-  updatePortfolioItem,
-  deletePortfolioItem,
-  getCaseStudies,
-  getCaseStudyById,
-  getFeaturedCaseStudies,
-  createCaseStudy,
-  updateCaseStudy,
-  deleteCaseStudy,
-  getContactMessages,
-  createContactMessage,
-  markMessageAsRead,
-  deleteContactMessage,
-};
