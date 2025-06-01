@@ -1,171 +1,112 @@
-import {
-  users,
-  portfolioItems,
-  caseStudies,
-  contactMessages,
-  adminSettings,
-  type User,
-  type UpsertUser,
-  type PortfolioItem,
+import { nanoid } from 'nanoid';
+import { 
+  User, 
+  PortfolioItem, 
+  CaseStudy, 
+  ContactMessage,
+  type IUser,
+  type IPortfolioItem,
+  type ICaseStudy,
+  type IContactMessage,
+  type InsertUser,
   type InsertPortfolioItem,
-  type CaseStudy,
   type InsertCaseStudy,
-  type ContactMessage,
-  type InsertContactMessage,
-  type AdminSettings,
-  type InsertAdminSettings,
-} from "@shared/schema";
-import { db } from "./db";
-import { eq, desc } from "drizzle-orm";
+  type InsertContactMessage
+} from '@shared/schema';
 
-export interface IStorage {
-  // User operations (required for authentication)
-  getUser(id: string): Promise<User | undefined>;
-  getUserByEmail(email: string): Promise<User | undefined>;
-  upsertUser(user: UpsertUser): Promise<User>;
-  
-  // Portfolio operations
-  getPortfolioItems(): Promise<PortfolioItem[]>;
-  getPortfolioItem(id: number): Promise<PortfolioItem | undefined>;
-  createPortfolioItem(item: InsertPortfolioItem): Promise<PortfolioItem>;
-  updatePortfolioItem(id: number, item: Partial<InsertPortfolioItem>): Promise<PortfolioItem>;
-  deletePortfolioItem(id: number): Promise<void>;
-  
-  // Case study operations
-  getCaseStudies(): Promise<CaseStudy[]>;
-  getCaseStudy(id: number): Promise<CaseStudy | undefined>;
-  createCaseStudy(study: InsertCaseStudy): Promise<CaseStudy>;
-  updateCaseStudy(id: number, study: Partial<InsertCaseStudy>): Promise<CaseStudy>;
-  deleteCaseStudy(id: number): Promise<void>;
-  
-  // Contact message operations
-  getContactMessages(): Promise<ContactMessage[]>;
-  createContactMessage(message: InsertContactMessage): Promise<ContactMessage>;
-  markMessageAsRead(id: number): Promise<void>;
-  deleteContactMessage(id: number): Promise<void>;
-  
-  // Admin settings operations
-  getAdminSettings(): Promise<AdminSettings[]>;
-  updateAdminSetting(key: string, value: string): Promise<AdminSettings>;
+export async function getUserByEmail(email: string): Promise<IUser | null> {
+  return await User.findOne({ email });
 }
 
-export class DatabaseStorage implements IStorage {
-  // User operations
-  async getUser(id: string): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.id, id));
-    return user;
-  }
+export async function getUserById(id: string): Promise<IUser | null> {
+  return await User.findOne({ id });
+}
 
-  async getUserByEmail(email: string): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.email, email));
-    return user;
-  }
-
-  async upsertUser(userData: UpsertUser): Promise<User> {
-    const [user] = await db
-      .insert(users)
-      .values(userData)
-      .onConflictDoUpdate({
-        target: users.id,
-        set: {
-          ...userData,
-          updatedAt: new Date(),
-        },
-      })
-      .returning();
-    return user;
-  }
-
-  // Portfolio operations
-  async getPortfolioItems(): Promise<PortfolioItem[]> {
-    return await db.select().from(portfolioItems).orderBy(desc(portfolioItems.createdAt));
-  }
-
-  async getPortfolioItem(id: number): Promise<PortfolioItem | undefined> {
-    const [item] = await db.select().from(portfolioItems).where(eq(portfolioItems.id, id));
-    return item;
-  }
-
-  async createPortfolioItem(item: InsertPortfolioItem): Promise<PortfolioItem> {
-    const [created] = await db.insert(portfolioItems).values(item).returning();
-    return created;
-  }
-
-  async updatePortfolioItem(id: number, item: Partial<InsertPortfolioItem>): Promise<PortfolioItem> {
-    const [updated] = await db
-      .update(portfolioItems)
-      .set({ ...item, updatedAt: new Date() })
-      .where(eq(portfolioItems.id, id))
-      .returning();
-    return updated;
-  }
-
-  async deletePortfolioItem(id: number): Promise<void> {
-    await db.delete(portfolioItems).where(eq(portfolioItems.id, id));
-  }
-
-  // Case study operations
-  async getCaseStudies(): Promise<CaseStudy[]> {
-    return await db.select().from(caseStudies).orderBy(desc(caseStudies.createdAt));
-  }
-
-  async getCaseStudy(id: number): Promise<CaseStudy | undefined> {
-    const [study] = await db.select().from(caseStudies).where(eq(caseStudies.id, id));
-    return study;
-  }
-
-  async createCaseStudy(study: InsertCaseStudy): Promise<CaseStudy> {
-    const [created] = await db.insert(caseStudies).values(study).returning();
-    return created;
-  }
-
-  async updateCaseStudy(id: number, study: Partial<InsertCaseStudy>): Promise<CaseStudy> {
-    const [updated] = await db
-      .update(caseStudies)
-      .set({ ...study, updatedAt: new Date() })
-      .where(eq(caseStudies.id, id))
-      .returning();
-    return updated;
-  }
-
-  async deleteCaseStudy(id: number): Promise<void> {
-    await db.delete(caseStudies).where(eq(caseStudies.id, id));
-  }
-
-  // Contact message operations
-  async getContactMessages(): Promise<ContactMessage[]> {
-    return await db.select().from(contactMessages).orderBy(desc(contactMessages.createdAt));
-  }
-
-  async createContactMessage(message: InsertContactMessage): Promise<ContactMessage> {
-    const [created] = await db.insert(contactMessages).values(message).returning();
-    return created;
-  }
-
-  async markMessageAsRead(id: number): Promise<void> {
-    await db.update(contactMessages).set({ read: true }).where(eq(contactMessages.id, id));
-  }
-
-  async deleteContactMessage(id: number): Promise<void> {
-    await db.delete(contactMessages).where(eq(contactMessages.id, id));
-  }
-
-  // Admin settings operations
-  async getAdminSettings(): Promise<AdminSettings[]> {
-    return await db.select().from(adminSettings);
-  }
-
-  async updateAdminSetting(key: string, value: string): Promise<AdminSettings> {
-    const [setting] = await db
-      .insert(adminSettings)
-      .values({ key, value })
-      .onConflictDoUpdate({
-        target: adminSettings.key,
-        set: { value, updatedAt: new Date() },
-      })
-      .returning();
-    return setting;
+export async function upsertUser(user: InsertUser): Promise<IUser> {
+  const existingUser = await User.findOne({ id: user.id });
+  if (existingUser) {
+    Object.assign(existingUser, user);
+    return await existingUser.save();
+  } else {
+    return await User.create(user);
   }
 }
 
-export const storage = new DatabaseStorage();
+export async function getPortfolioItems(): Promise<IPortfolioItem[]> {
+  return await PortfolioItem.find().sort({ createdAt: -1 });
+}
+
+export async function getPortfolioItemById(id: string): Promise<IPortfolioItem | null> {
+  return await PortfolioItem.findOne({ id });
+}
+
+export async function getFeaturedPortfolioItems(): Promise<IPortfolioItem[]> {
+  return await PortfolioItem.find({ featured: true }).sort({ createdAt: -1 });
+}
+
+export async function createPortfolioItem(item: Omit<InsertPortfolioItem, 'id'>): Promise<IPortfolioItem> {
+  const portfolioItem = {
+    ...item,
+    id: nanoid()
+  };
+  return await PortfolioItem.create(portfolioItem);
+}
+
+export async function updatePortfolioItem(id: string, updates: Partial<InsertPortfolioItem>): Promise<IPortfolioItem | null> {
+  return await PortfolioItem.findOneAndUpdate({ id }, updates, { new: true });
+}
+
+export async function deletePortfolioItem(id: string): Promise<boolean> {
+  const result = await PortfolioItem.deleteOne({ id });
+  return result.deletedCount > 0;
+}
+
+export async function getCaseStudies(): Promise<ICaseStudy[]> {
+  return await CaseStudy.find().sort({ createdAt: -1 });
+}
+
+export async function getCaseStudyById(id: string): Promise<ICaseStudy | null> {
+  return await CaseStudy.findOne({ id });
+}
+
+export async function getFeaturedCaseStudies(): Promise<ICaseStudy[]> {
+  return await CaseStudy.find({ featured: true }).sort({ createdAt: -1 });
+}
+
+export async function createCaseStudy(caseStudy: Omit<InsertCaseStudy, 'id'>): Promise<ICaseStudy> {
+  const newCaseStudy = {
+    ...caseStudy,
+    id: nanoid()
+  };
+  return await CaseStudy.create(newCaseStudy);
+}
+
+export async function updateCaseStudy(id: string, updates: Partial<InsertCaseStudy>): Promise<ICaseStudy | null> {
+  return await CaseStudy.findOneAndUpdate({ id }, updates, { new: true });
+}
+
+export async function deleteCaseStudy(id: string): Promise<boolean> {
+  const result = await CaseStudy.deleteOne({ id });
+  return result.deletedCount > 0;
+}
+
+export async function getContactMessages(): Promise<IContactMessage[]> {
+  return await ContactMessage.find().sort({ createdAt: -1 });
+}
+
+export async function createContactMessage(message: Omit<InsertContactMessage, 'id'>): Promise<IContactMessage> {
+  const contactMessage = {
+    ...message,
+    id: nanoid()
+  };
+  return await ContactMessage.create(contactMessage);
+}
+
+export async function markMessageAsRead(id: string): Promise<IContactMessage | null> {
+  return await ContactMessage.findOneAndUpdate({ id }, { read: true }, { new: true });
+}
+
+export async function deleteContactMessage(id: string): Promise<boolean> {
+  const result = await ContactMessage.deleteOne({ id });
+  return result.deletedCount > 0;
+}

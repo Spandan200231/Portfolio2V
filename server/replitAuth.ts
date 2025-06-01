@@ -1,27 +1,23 @@
+import express, { type Express } from "express";
+import session from "express-session";
+import MongoStore from "connect-mongo";
 import passport from "passport";
 import { Strategy as LocalStrategy } from "passport-local";
 import bcrypt from "bcrypt";
-import session from "express-session";
-import type { Express, RequestHandler } from "express";
-import connectPg from "connect-pg-simple";
-import { storage } from "./storage";
+import * as storage from "./storage";
 
-// Default admin credentials (you can change these via environment variables)
 const DEFAULT_ADMIN_EMAIL = process.env.ADMIN_EMAIL || "admin@portfolio.com";
 const DEFAULT_ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "admin123";
 
 export function getSession() {
   const sessionTtl = 7 * 24 * 60 * 60 * 1000; // 1 week
-  const pgStore = connectPg(session);
-  const sessionStore = new pgStore({
-    conString: process.env.DATABASE_URL,
-    createTableIfMissing: false,
-    ttl: sessionTtl,
-    tableName: "sessions",
-  });
+
   return session({
-    secret: process.env.SESSION_SECRET!,
-    store: sessionStore,
+    secret: process.env.SESSION_SECRET || 'your-secret-key',
+    store: MongoStore.create({
+      mongoUrl: process.env.DATABASE_URL,
+      ttl: sessionTtl / 1000, // convert to seconds
+    }),
     resave: false,
     saveUninitialized: false,
     cookie: {
@@ -31,6 +27,40 @@ export function getSession() {
     },
   });
 }
+
+// Set up local strategy for email/password authentication
+passport.use(new LocalStrategy(
+  {
+    usernameField: 'email',
+    passwordField: 'password'
+  },
+  async (email, password, done) => {
+    try {
+      const user = await storage.getUserByEmail(email);
+      if (!user) {
+        return done(null, false, { message: 'Invalid email or password' });
+      }
+
+      const isValidPassword = await bcrypt.compare(password, user.password || '');
+      if (!isValidPassword) {
+        return done(null, false, { message: 'Invalid email or password' });
+      }
+
+      return done(null, {
+        id: user.id,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        profileImageUrl: user.profileImageUrl
+      });
+    } catch (error) {
+      return done(error);
+    }
+  }
+));
+
+passport.serializeUser((user: any, cb) => cb(null, user));
+passport.deserializeUser((user: any, cb) => cb(null, user));
 
 async function createDefaultAdmin() {
   try {
@@ -61,69 +91,25 @@ export async function setupAuth(app: Express) {
   // Create default admin user
   await createDefaultAdmin();
 
-  // Set up local strategy for email/password authentication
-  passport.use(new LocalStrategy(
-    {
-      usernameField: 'email',
-      passwordField: 'password'
-    },
-    async (email, password, done) => {
-      try {
-        const user = await storage.getUserByEmail(email);
-        if (!user) {
-          return done(null, false, { message: 'Invalid email or password' });
-        }
-
-        const isValidPassword = await bcrypt.compare(password, user.password || '');
-        if (!isValidPassword) {
-          return done(null, false, { message: 'Invalid email or password' });
-        }
-
-        return done(null, {
-          id: user.id,
-          email: user.email,
-          firstName: user.firstName,
-          lastName: user.lastName,
-          profileImageUrl: user.profileImageUrl
-        });
-      } catch (error) {
-        return done(error);
-      }
-    }
-  ));
-
-  passport.serializeUser((user: any, cb) => cb(null, user));
-  passport.deserializeUser((user: any, cb) => cb(null, user));
-
-  // Login route
-  app.post("/api/login", (req, res, next) => {
-    passport.authenticate("local", (err: any, user: any, info: any) => {
-      if (err) {
-        return res.status(500).json({ message: "Authentication error" });
-      }
-      if (!user) {
-        return res.status(401).json({ message: info?.message || "Invalid credentials" });
-      }
-      req.logIn(user, (err) => {
-        if (err) {
-          return res.status(500).json({ message: "Login error" });
-        }
-        return res.json({ message: "Login successful", user });
-      });
-    })(req, res, next);
+  // Add auth routes
+  app.post('/api/auth/login', passport.authenticate('local'), (req, res) => {
+    res.json({ user: req.user });
   });
 
-  // Logout route
-  app.post("/api/logout", (req, res) => {
-    req.logout(() => {
-      res.json({ message: "Logout successful" });
+  app.post('/api/auth/logout', (req, res) => {
+    req.logout((err) => {
+      if (err) {
+        return res.status(500).json({ error: 'Logout failed' });
+      }
+      res.json({ message: 'Logged out successfully' });
     });
   });
-}
 
-export const isAuthenticated: RequestHandler = async (req, res, next) => {
-  if (!req.isAuthenticated() || !req.user) {
-    return res.status(401).json({ message: "Unauthorized" });
-  }
-  return next();
-};
+  app.get('/api/auth/me', (req, res) => {
+    if (req.isAuthenticated()) {
+      res.json({ user: req.user });
+    } else {
+      res.status(401).json({ error: 'Not authenticated' });
+    }
+  });
+}

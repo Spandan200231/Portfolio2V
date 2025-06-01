@@ -1,123 +1,151 @@
-import {
-  pgTable,
-  text,
-  varchar,
-  timestamp,
-  jsonb,
-  index,
-  serial,
-  boolean,
-} from "drizzle-orm/pg-core";
-import { createInsertSchema } from "drizzle-zod";
-import { z } from "zod";
 
-// Session storage table for Replit Auth
-export const sessions = pgTable(
-  "sessions",
-  {
-    sid: varchar("sid").primaryKey(),
-    sess: jsonb("sess").notNull(),
-    expire: timestamp("expire").notNull(),
-  },
-  (table) => [index("IDX_session_expire").on(table.expire)],
-);
+import mongoose, { Schema, Document } from 'mongoose';
 
-// User storage table for authentication
-export const users = pgTable("users", {
-  id: varchar("id").primaryKey().notNull(),
-  email: varchar("email").unique(),
-  password: varchar("password"),
-  firstName: varchar("first_name"),
-  lastName: varchar("last_name"),
-  profileImageUrl: varchar("profile_image_url"),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
+// User interface and schema
+export interface IUser extends Document {
+  id: string;
+  email: string;
+  firstName?: string;
+  lastName?: string;
+  profileImageUrl?: string;
+  password?: string;
+}
+
+const userSchema = new Schema({
+  id: { type: String, required: true, unique: true },
+  email: { type: String, required: true, unique: true },
+  firstName: String,
+  lastName: String,
+  profileImageUrl: String,
+  password: String,
+}, { timestamps: true });
+
+export const User = mongoose.model<IUser>('User', userSchema);
+
+// Portfolio Item interface and schema
+export interface IPortfolioItem extends Document {
+  id: string;
+  title: string;
+  description: string;
+  technologies: string[];
+  imageUrl?: string;
+  projectUrl?: string;
+  githubUrl?: string;
+  featured: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+const portfolioItemSchema = new Schema({
+  id: { type: String, required: true, unique: true },
+  title: { type: String, required: true },
+  description: { type: String, required: true },
+  technologies: [{ type: String }],
+  imageUrl: String,
+  projectUrl: String,
+  githubUrl: String,
+  featured: { type: Boolean, default: false },
+}, { timestamps: true });
+
+export const PortfolioItem = mongoose.model<IPortfolioItem>('PortfolioItem', portfolioItemSchema);
+
+// Case Study interface and schema
+export interface ICaseStudy extends Document {
+  id: string;
+  title: string;
+  description: string;
+  content: string;
+  imageUrl?: string;
+  technologies: string[];
+  projectUrl?: string;
+  githubUrl?: string;
+  featured: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+const caseStudySchema = new Schema({
+  id: { type: String, required: true, unique: true },
+  title: { type: String, required: true },
+  description: { type: String, required: true },
+  content: { type: String, required: true },
+  imageUrl: String,
+  technologies: [{ type: String }],
+  projectUrl: String,
+  githubUrl: String,
+  featured: { type: Boolean, default: false },
+}, { timestamps: true });
+
+export const CaseStudy = mongoose.model<ICaseStudy>('CaseStudy', caseStudySchema);
+
+// Contact Message interface and schema
+export interface IContactMessage extends Document {
+  id: string;
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+  read: boolean;
+  createdAt: Date;
+}
+
+const contactMessageSchema = new Schema({
+  id: { type: String, required: true, unique: true },
+  name: { type: String, required: true },
+  email: { type: String, required: true },
+  subject: { type: String, required: true },
+  message: { type: String, required: true },
+  read: { type: Boolean, default: false },
+}, { timestamps: true });
+
+export const ContactMessage = mongoose.model<IContactMessage>('ContactMessage', contactMessageSchema);
+
+// Export types for compatibility
+export type InsertUser = Omit<IUser, keyof Document>;
+export type InsertPortfolioItem = Omit<IPortfolioItem, keyof Document>;
+export type InsertCaseStudy = Omit<ICaseStudy, keyof Document>;
+export type InsertContactMessage = Omit<IContactMessage, keyof Document>;
+
+// Validation schemas (you can use zod for validation)
+import { z } from 'zod';
+
+export const insertUserSchema = z.object({
+  id: z.string(),
+  email: z.string().email(),
+  firstName: z.string().optional(),
+  lastName: z.string().optional(),
+  profileImageUrl: z.string().optional(),
+  password: z.string().optional(),
 });
 
-// Portfolio items table
-export const portfolioItems = pgTable("portfolio_items", {
-  id: serial("id").primaryKey(),
-  title: varchar("title", { length: 255 }).notNull(),
-  description: text("description").notNull(),
-  shortDescription: varchar("short_description", { length: 500 }),
-  imageUrl: varchar("image_url", { length: 500 }),
-  technologies: jsonb("technologies").$type<string[]>().default([]),
-  projectUrl: varchar("project_url", { length: 500 }),
-  githubUrl: varchar("github_url", { length: 500 }),
-  content: text("content"), // Rich content for detail page
-  featured: boolean("featured").default(false),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
+export const insertPortfolioItemSchema = z.object({
+  id: z.string(),
+  title: z.string().min(1),
+  description: z.string().min(1),
+  technologies: z.array(z.string()),
+  imageUrl: z.string().optional(),
+  projectUrl: z.string().optional(),
+  githubUrl: z.string().optional(),
+  featured: z.boolean().default(false),
 });
 
-// Case studies table
-export const caseStudies = pgTable("case_studies", {
-  id: serial("id").primaryKey(),
-  title: varchar("title", { length: 255 }).notNull(),
-  excerpt: text("excerpt").notNull(),
-  content: text("content").notNull(),
-  imageUrl: varchar("image_url", { length: 500 }),
-  tags: jsonb("tags").$type<string[]>().default([]),
-  clientName: varchar("client_name", { length: 255 }),
-  projectDuration: varchar("project_duration", { length: 100 }),
-  outcome: text("outcome"),
-  featured: boolean("featured").default(false),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
+export const insertCaseStudySchema = z.object({
+  id: z.string(),
+  title: z.string().min(1),
+  description: z.string().min(1),
+  content: z.string().min(1),
+  imageUrl: z.string().optional(),
+  technologies: z.array(z.string()),
+  projectUrl: z.string().optional(),
+  githubUrl: z.string().optional(),
+  featured: z.boolean().default(false),
 });
 
-// Contact messages table
-export const contactMessages = pgTable("contact_messages", {
-  id: serial("id").primaryKey(),
-  name: varchar("name", { length: 255 }).notNull(),
-  email: varchar("email", { length: 255 }).notNull(),
-  message: text("message").notNull(),
-  attachmentUrl: varchar("attachment_url", { length: 500 }),
-  attachmentName: varchar("attachment_name", { length: 255 }),
-  read: boolean("read").default(false),
-  createdAt: timestamp("created_at").defaultNow(),
+export const insertContactMessageSchema = z.object({
+  id: z.string(),
+  name: z.string().min(1),
+  email: z.string().email(),
+  subject: z.string().min(1),
+  message: z.string().min(1),
+  read: z.boolean().default(false),
 });
-
-// Admin settings table
-export const adminSettings = pgTable("admin_settings", {
-  id: serial("id").primaryKey(),
-  key: varchar("key", { length: 100 }).notNull().unique(),
-  value: text("value"),
-  updatedAt: timestamp("updated_at").defaultNow(),
-});
-
-// Schema exports for forms
-export const insertPortfolioItemSchema = createInsertSchema(portfolioItems).omit({
-  id: true,
-  createdAt: true,
-  updatedAt: true,
-});
-
-export const insertCaseStudySchema = createInsertSchema(caseStudies).omit({
-  id: true,
-  createdAt: true,
-  updatedAt: true,
-});
-
-export const insertContactMessageSchema = createInsertSchema(contactMessages).omit({
-  id: true,
-  read: true,
-  createdAt: true,
-});
-
-export const insertAdminSettingsSchema = createInsertSchema(adminSettings).omit({
-  id: true,
-  updatedAt: true,
-});
-
-// Type exports
-export type User = typeof users.$inferSelect;
-export type UpsertUser = typeof users.$inferInsert;
-export type PortfolioItem = typeof portfolioItems.$inferSelect;
-export type InsertPortfolioItem = z.infer<typeof insertPortfolioItemSchema>;
-export type CaseStudy = typeof caseStudies.$inferSelect;
-export type InsertCaseStudy = z.infer<typeof insertCaseStudySchema>;
-export type ContactMessage = typeof contactMessages.$inferSelect;
-export type InsertContactMessage = z.infer<typeof insertContactMessageSchema>;
-export type AdminSettings = typeof adminSettings.$inferSelect;
-export type InsertAdminSettings = z.infer<typeof insertAdminSettingsSchema>;
